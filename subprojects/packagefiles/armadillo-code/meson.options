@@ -1,0 +1,12 @@
+option('lapack',
+    description: 'Choose an implementation of the LAPACK solver',
+    type: 'combo',
+    choices: [
+        'openblas64',
+        'openblas',
+        'lapack64',
+        'lapack',
+        'none',
+    ],
+    value: 'openblas',
+)

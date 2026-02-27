@@ -1,0 +1,3 @@
+option('name', type: 'string', value: 'mpc_re',
+    description: 'Problem definition folder having constants.hpp and problem-def.hpp',
+)
