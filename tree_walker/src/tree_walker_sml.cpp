@@ -102,6 +102,7 @@ struct StateMachine {
 using dispatch_t = boost::sml::dispatch<boost::sml::back::policies::switch_stm>;
 }  // namespace
 
+namespace pdaqp_solver {
 FeedbackID
 treeWalker(const Parameter parameter) {
     FeedbackID result{};
@@ -135,3 +136,4 @@ treeWalker(const Parameter parameter) {
 
     return result;
 }
+}  // namespace pdaqp_solver

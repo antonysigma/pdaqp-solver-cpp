@@ -9,10 +9,13 @@ tree_walker_sml_lib = static_library('tree-walker-sml',
         subproject('boost-sml').get_variable('boost_sml_inc'),
     ],
     cpp_args: [
-        '-march=native',
+        hardware_capability,
         '-ftemplate-depth=5000',
         '-ffunction-sections',
         '-fdata-sections',
+    ],
+    dependencies: [
+        avr_stdcpp_dep,
     ],
     build_by_default: false,
 )
@@ -25,9 +28,12 @@ tree_walker_lut_lib = static_library('tree-walker-lut',
         tree_walker_inc,
     ],
     cpp_args: [
-        '-march=native',
+        hardware_capability,
         '-ffunction-sections',
         '-fdata-sections',
+    ],
+    dependencies: [
+        avr_stdcpp_dep,
     ],
 )
 
@@ -39,9 +45,12 @@ tree_walker_heap_lib = static_library('tree-walker-heap',
         tree_walker_inc,
     ],
     cpp_args: [
-        '-march=native',
+        hardware_capability,
         '-ffunction-sections',
         '-fdata-sections',
+    ],
+    dependencies: [
+        avr_stdcpp_dep,
     ],
 )
 

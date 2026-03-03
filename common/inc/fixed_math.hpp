@@ -78,7 +78,7 @@ static_assert(static_cast<float>(-0.125_q214) == -0.125f);
 template <size_t Q>
 constexpr auto
 operator*(const fixed<int16_t, Q>& a, const fixed<int16_t, Q>& b) {
-    return fixed<int32_t, Q * 2>{a.data * b.data};
+    return fixed<int32_t, Q * 2>{static_cast<int32_t>(a.data) * b.data};
 }
 
 static_assert(static_cast<float>(-0.25_q214 * 0.5_q214) == -0.125f);

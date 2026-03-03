@@ -5,9 +5,9 @@
 
 #include "apply_feedback.h"
 #include "constants.hpp"
+#include "fixed_math.hpp"
 #include "problem-def.hpp"
 #include "tree_walker.h"
-#include "fixed_math.hpp"
 
 /** Teach fmtlib how to print fixed point decimals. */
 template <typename T, uint16_t Q>
@@ -28,7 +28,7 @@ struct fmt::formatter<math::fixed<T, Q>> : formatter<std::string_view> {
  * the values in little-endian representation. Walk along the binary decision
  * tree to determine the half-space within constraint. Perform affine transform
  * to solve the quadratic programming problem.
-*/
+ */
 int
 main(const int argc, const char** argv) {
     if (argc != 2 || std::strlen(argv[1]) < sizeof(Parameter)) {
@@ -37,8 +37,8 @@ main(const int argc, const char** argv) {
 
     const Parameter parameter = *reinterpret_cast<const Parameter*>(argv[1]);
 
-    const auto feedback_id = treeWalker(parameter);
-    const auto solution = applyFeedback<true>(feedback_id, std::move(parameter));
+    const auto feedback_id = pdaqp_solver::treeWalker(parameter);
+    const auto solution = pdaqp_solver::applyFeedback<true>(feedback_id, std::move(parameter));
 
     fmt::print("Solution: {}\n", solution.data);
     return 0;

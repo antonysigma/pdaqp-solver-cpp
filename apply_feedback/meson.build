@@ -6,12 +6,12 @@ apply_feedback_lib = static_library('apply-feedback',
         'inc',
     ],
     cpp_args: [
-        '-march=native',
+        hardware_capability,
         '-ffunction-sections',
         '-fdata-sections',
     ],
     dependencies: [
-        subproject('armadillo-code').get_variable('armadillo_dep'),
+        avr_stdcpp_dep,
     ],
 )
 

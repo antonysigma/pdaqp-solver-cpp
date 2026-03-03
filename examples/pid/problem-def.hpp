@@ -39,8 +39,7 @@ constexpr std::array<float, 27> pdaqp_feedbacks = {
 constexpr std::array<uint16_t, 5> pdaqp_hp_list{
     1,
     0,
-    // 2,
-    1,
+    2,
     1,
     0,
 };

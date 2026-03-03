@@ -105,16 +105,21 @@ buildHeapTree(std::array<hyperplane::JumpOrFeedback, n_tree_nodes> decoded_jump_
     return out;
 }
 
+namespace pdaqp_solver_internal {
 constexpr auto tree{buildHeapTree(hyperplane::decodeJumpList())};
 
 constexpr size_t n_hyperplanes = pdaqp_halfplanes.size() / (n_parameter + 1);
 constexpr auto hyperplane_fn_list{
     hyperplane::makeHalfspaceList(std::make_index_sequence<n_hyperplanes>{})};
 
+}  // namespace pdaqp_solver_internal
 }  // namespace
 
+namespace pdaqp_solver {
 FeedbackID
 treeWalker(const Parameter parameter) {
+    using pdaqp_solver_internal::hyperplane_fn_list;
+    using pdaqp_solver_internal::tree;
     /** Eytzinger-style binary decision search algorithm.
      *
      * Compared to the default LUT algorithm based on hp_list and jump_list as
@@ -136,3 +141,5 @@ treeWalker(const Parameter parameter) {
 
     return invalid_feedback_id;
 }
+
+}  // namespace pdaqp_solver

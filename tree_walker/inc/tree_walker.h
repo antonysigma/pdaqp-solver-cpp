@@ -1,6 +1,7 @@
 #pragma once
 #include "types.hpp"
 
+namespace pdaqp_solver {
 /** Query the feedback ID from a pre-computed binary decision tree.
  *
  * Given a parameter vector, walk the binary decision tree. Each node in the
@@ -8,5 +9,5 @@
  *
  * Once the leaf node is reached, return the corresponding feedback ID.
  */
-__attribute__((visibility("default"))) FeedbackID treeWalker(const
-   Parameter);
+FeedbackID treeWalker(const Parameter);
+}  // namespace pdaqp_solver
