@@ -7,8 +7,7 @@ project('pdaqp-cpp', 'cpp',
     'b_ndebug=if-release',
 ])
 
-#problem_def_inc = include_directories('examples' / get_option('name'))
-problem_def_inc = include_directories('examples' / 'pid')
+problem_def_inc = include_directories('examples' / get_option('name'))
 
 subdir('common')
 subdir('tree_walker')
@@ -31,7 +30,7 @@ main_exe = executable('pdaqp-cpp',
       '-Wl,-Map=pdaqp-cpp.map',
     ],
     dependencies: [
-      tree_walker_sml_dep,
+      tree_walker_heap_dep,
       apply_feedback_dep,
       subproject('fmt').get_variable('fmt_dep'),
     ]

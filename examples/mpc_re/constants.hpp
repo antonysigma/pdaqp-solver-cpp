@@ -19,6 +19,6 @@ log2ceil(size_t n) {
 }
 
 using DataFormat = math::fixed<int16_t, 14>;
-using AccuDataFormat = math::fixed<int32_t, 14 * 2 - log2ceil(n_parameter)>;
+using AccuDataFormat = math::fixed<int32_t, 14 * 2 - log2ceil(n_parameter* n_solution) - 1>;
 // using DataFormat = float;
 // using AccuDataFormat = float;
