@@ -38,10 +38,9 @@ matrixMultiplyAdd(const Mat<M, N>& a_v, const Vector<N>& b_v, const Vector<M>& c
             result.data[i] = Decimal{c_v.data[i]};
         }
 
-        for (uint32_t j = 0; j < N; ++j) {
-            const auto bj = b_v.data[j];
-            for (uint32_t i = 0; i < M; ++i) {
-                result.data[i] += a_v.data[j * M + i] * bj;
+        for (uint32_t i = 0; i < M; ++i) {
+            for (uint32_t j = 0; j < N; ++j) {
+                result.data[i] += a_v.data[i * N + j] * b_v.data[j];
             }
         }
 #ifdef ARMA_INCLUDES
