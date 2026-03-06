@@ -95,7 +95,7 @@ makeOffsetList(std::index_sequence<Is...>) {
 namespace pdaqp_solver_internal {
 
 template <size_t feedback_id>
-Solution
+auto
 applyFeedbackFn(const Parameter& p) {
     constexpr auto scale{feedbackScale<feedback_id>()};
     constexpr auto offset{feedbackOffset<feedback_id>()};
@@ -113,18 +113,6 @@ constexpr size_t n_feedbacks = pdaqp_feedbacks.size() / (n_parameter + 1) / n_so
 constexpr auto scale_list{makeScaleList(std::make_index_sequence<n_feedbacks>{})};
 constexpr auto offset_list{makeOffsetList(std::make_index_sequence<n_feedbacks>{})};
 
-/** Dispatch via switch statement.
- *
- * After flattening the nested switch statements, the compiler identifies the
- * idential tail call matrixMultiplyAdd, so it convert all the hardcoded scales
- * and offset addresses in a if-else chain.
- */
-Solution
-applyFeedbackImpl(const FeedbackID id, const Parameter& parameter) {
-    const auto id_clamped = std::min(n_feedbacks - 1, size_t(id.value));
-    return matrixMultiplyAdd(scale_list[id_clamped], parameter, offset_list[id_clamped]);
-}
-
 }  // namespace pdaqp_solver_internal
 
 }  // namespace
@@ -133,18 +121,36 @@ namespace pdaqp_solver {
 template <bool force_function_table>
 Solution
 applyFeedback(const FeedbackID id, const Parameter p) {
-    using pdaqp_solver_internal::applyFeedbackImpl;
     using pdaqp_solver_internal::n_feedbacks;
     using pdaqp_solver_internal::offset_list;
     using pdaqp_solver_internal::scale_list;
 
-    if constexpr (force_function_table) {
-        constexpr auto feedback_function_list{
-            pdaqp_solver_internal::makeFeedbackFnList(std::make_index_sequence<n_feedbacks>{})};
-        const auto id_clamped = std::min(n_feedbacks - 1, size_t(id.value));
-        return feedback_function_list[id_clamped](p);
+    constexpr auto feedback_function_list{
+        pdaqp_solver_internal::makeFeedbackFnList(std::make_index_sequence<n_feedbacks>{})};
+    const auto id_clamped = std::min(n_feedbacks - 1, size_t(id.value));
+
+    const auto resultFn = [&, id_clamped, p]() {
+        if constexpr (force_function_table) {
+            return feedback_function_list[id_clamped](p);
+        } else {
+            return matrixMultiplyAdd(scale_list[id_clamped], p, offset_list[id_clamped]);
+        }
+    };
+
+    using Decimal = Solution::value_type;
+    using IntermediateDecimal =
+        std::invoke_result_t<decltype(pdaqp_solver_internal::applyFeedbackFn<0>),
+                             const Parameter&>::value_type;
+
+    if constexpr (std::is_same_v<Decimal, float> || std::is_same_v<Decimal, IntermediateDecimal>) {
+        return resultFn();
     } else {
-        return pdaqp_solver_internal::applyFeedbackImpl(id, p);
+        Solution solution;
+
+        const auto result = resultFn();
+        std::transform(result.data.begin(), result.data.end(), solution.data.begin(),
+                       [](const auto& x) { return Decimal::truncateFrom(x); });
+        return solution;
     }
 }
 

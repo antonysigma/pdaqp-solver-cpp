@@ -40,31 +40,49 @@ template <std::signed_integral T = int16_t, size_t Q = 14>
 
     /** Cast to floating point number for logging to console. */
     constexpr explicit operator float() const { return static_cast<float>(data) / (1UL << Q); }
+
+    /** Automatically generate <= , >= , == operators. */
+    constexpr auto operator<=>(const fixed<T, Q>&) const = default;
+
+    template <size_t Q2>
+        requires(Q2 > Q)
+    static constexpr fixed<T, Q> truncateFrom(const fixed<int32_t, Q2>& other) {
+        return fixed<T, Q>{static_cast<T>(other.data >> (Q2 - Q))};
+    }
 };
 
+// Bit exact floating point conversion for rational numbers.
 static_assert(static_cast<float>(fixed<>{0.125f}) == 0.125f);
 static_assert(static_cast<float>(fixed<>{-0.125f}) == -0.125f);
 
+// Ensure little-endian notations.
 static_assert(fixed<int32_t, 12>{fixed<int32_t, 4>{static_cast<int32_t>(0xBEEF)}}.data ==
               0x00BE'EF00);
 static_assert(!std::is_same_v<fixed<>, float>);
 
+// Upcasting from 16-bit to 32-bit
 static_assert(static_cast<float>(fixed<int32_t, 14>{fixed<int16_t, 8>{0.125f}}) == 0.125f);
 static_assert(static_cast<float>(fixed<int32_t, 14>{fixed<int16_t, 8>{-0.125f}}) == -0.125f);
 
+/** Shorthand for Q2_14. */
 constexpr auto
 operator""_q214(const long double v) {
-    return fixed<int16_t, 14>{static_cast<float>(v)};
+    return fixed<int16_t, 14>{static_cast<int16_t>(v * (1UL << 14))};
 };
 
 static_assert(static_cast<float>(0.125_q214) == 0.125f);
 
+/** Shorthand for Q4_28. */
 constexpr auto
 operator""_q428(const long double v) {
-    return fixed<int32_t, 28>{static_cast<float>(v)};
+    return fixed<int32_t, 28>{static_cast<int32_t>(v * (1UL << 28))};
 };
 
 static_assert(static_cast<float>(0.125_q214) == 0.125f);
+
+// Truncation
+static_assert(fixed<int16_t, 14>::truncateFrom(0.125_q428) == 0.125_q214);
+static_assert(fixed<int16_t, 14>::truncateFrom(fixed<int32_t, 26>{0.125f}) == 0.125_q214);
 
 template <std::signed_integral T, size_t Q>
 constexpr auto
@@ -107,16 +125,23 @@ static_assert(0.314_q428 == 0.314_q428);
 
 template <size_t Q2, size_t Q>
 constexpr fixed<int32_t, Q2>&
-operator+=(fixed<int32_t, Q2>& accu, const fixed<int32_t, Q>& b) {
-    static_assert(Q2 <= Q);
+operator+=(fixed<int32_t, Q2>& accu, const fixed<int32_t, Q>& b)
+    requires(Q2 <= Q)
+{
     accu.data += b.data >> (Q - Q2);
     return accu;
 }
 
 static_assert([]() {
-    auto accu = 0.1_q428;
-    accu += -0.25_q214 * 0.5_q214;
+    auto accu = -0.5_q428;
+    accu += 0.25_q214 * 0.5_q214;
     return accu;
-}() == -0.025_q428);
+}() == -0.375_q428);
+
+static_assert([]() {
+    auto accu = fixed<int32_t, 26>{-0.5_q214};
+    accu += 0.25_q214 * 0.5_q214;
+    return accu;
+}() == fixed<int32_t, 26>{-0.375_q214});
 
 }  // namespace math

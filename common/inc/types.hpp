@@ -3,6 +3,8 @@
 #include <cstdint>
 
 #include "constants.hpp"
+#include "fixed_math.hpp"
+#include "log2ceil.hpp"
 
 /** The half-space identifier.
  *
@@ -44,4 +46,5 @@ struct Vector {
 using Parameter = vector_math::Vector<n_parameter>;
 
 /** Output solution from the PDA-QP algorithm. */
-using Solution = vector_math::Vector<n_solution, AccuDataFormat>;
+using Solution =
+    vector_math::Vector<n_solution, math::fixed<int16_t, 14 - log2ceil(n_parameter) - 1>>;

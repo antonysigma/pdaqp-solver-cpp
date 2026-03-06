@@ -8,4 +8,4 @@ constexpr uint16_t n_parameter = 2;
 constexpr uint16_t n_solution = 3;
 
 using DataFormat = math::fixed<int16_t, 14>;
-using AccuDataFormat = math::fixed<int32_t, 14 * 2 - log2ceil(n_parameter* n_solution) - 1>;
+using AccuDataFormat = math::fixed<int32_t, 14 * 2 - log2ceil(n_parameter) - 1>;
