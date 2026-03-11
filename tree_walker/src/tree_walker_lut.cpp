@@ -33,4 +33,18 @@ treeWalker(const Parameter parameter) {
     }
     return {pdaqp_hp_list[id]};
 }
+
+FeedbackID
+treeWalkerMocked(uint32_t walk_trajectory_preset) {
+    uint16_t id = 0;
+    uint16_t next_id = pdaqp_jump_list.front();
+
+    while (id != next_id) {
+        const auto hp_id = pdaqp_hp_list[id];
+        id = next_id + (walk_trajectory_preset & 0x1);
+        next_id = id + pdaqp_jump_list[id];
+        walk_trajectory_preset >>= 1;
+    }
+    return {pdaqp_hp_list[id]};
+}
 }  // namespace pdaqp_solver

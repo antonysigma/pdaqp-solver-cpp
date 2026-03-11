@@ -10,4 +10,11 @@ namespace pdaqp_solver {
  * Once the leaf node is reached, return the corresponding feedback ID.
  */
 FeedbackID treeWalker(const Parameter);
+
+/** Mock tree walker.
+ *
+ * Given a 32-bit binary sequence, walk the binary tree's left/right branches in accordance to the
+ * corresponding bit in the sequence. Return the halfplane ID when the leaf node is reached.
+ */
+FeedbackID treeWalkerMocked(uint32_t walk_trajectory_preset);
 }  // namespace pdaqp_solver
