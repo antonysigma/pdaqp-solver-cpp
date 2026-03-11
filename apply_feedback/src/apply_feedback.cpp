@@ -115,6 +115,15 @@ constexpr auto offset_list{makeOffsetList(std::make_index_sequence<n_feedbacks>{
 
 }  // namespace pdaqp_solver_internal
 
+template <class Out, class In>
+constexpr Out
+convertValue(const In& x) {
+    if constexpr (std::is_same_v<Out, float>) {
+        return x;
+    } else {
+        return Out::truncateFrom(x);
+    }
+}
 }  // namespace
 
 namespace pdaqp_solver {
@@ -149,7 +158,7 @@ applyFeedback(const FeedbackID id, const Parameter p) {
 
         const auto result = resultFn();
         std::transform(result.data.begin(), result.data.end(), solution.data.begin(),
-                       [](const auto& x) { return Decimal::truncateFrom(x); });
+                       convertValue<Decimal, decltype(result.data[0])>);
         return solution;
     }
 }

@@ -46,5 +46,8 @@ struct Vector {
 using Parameter = vector_math::Vector<n_parameter>;
 
 /** Output solution from the PDA-QP algorithm. */
-using Solution =
-    vector_math::Vector<n_solution, math::fixed<int16_t, 14 - log2ceil(n_parameter) - 1>>;
+using SolutionType = std::conditional_t<                         //
+    std::is_same_v<DataFormat, float>,                           //
+    float, math::fixed<int16_t, 14 - log2ceil(n_parameter) - 1>  //
+    >;
+using Solution = vector_math::Vector<n_solution, SolutionType>;
